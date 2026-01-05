@@ -29,10 +29,11 @@ The backend follows a layered architecture to separate concerns and improve main
     - `session.py`
     - `migrations/`
   - `models/` - Database models.
-    - `user.py`
+    - `base.py`
     - `fingerprint.py`
     - `lock.py`
     - `log.py`
+    - `user.py`
   - `repositories/` - Data access layer.
     - `user_repository.py`
     - `fingerprint_repository.py`
@@ -95,56 +96,59 @@ Each layer has a single responsibility:
 ## Database Schema
 The backend uses a relational database to persist system state and audit data.
 All destructive operations use soft deletes to preserve historical records.
+All timestamps are stored in UTC.
 
 ### Users
 Admin users who can access the admin UI.
 
-| Field | Type | Description                        |
-|------|------|------------------------------------|
-| id | UUID | Unique user identifier             |
-| username | String | Unique login name                  |
-| password_hash | String | Hashed user password               |
-| role | String | Authorization role (e.g., `admin`) |
-| created_at | Timestamp | User creation time                 |
-| deleted_at | Timestamp | Soft delete timestamp (nullable)   |
+| Field         | Type      | Description                        |
+|---------------|-----------|------------------------------------|
+| id            | Int       | Unique user identifier             |
+| name          | String    | Name                               |
+| username      | String    | Unique login name                  |
+| password_hash | String    | Hashed user password               |
+| role          | String    | Authorization role (e.g., `admin`) |
+| created_at    | Timestamp | User creation time                 |
+| deleted_at    | Timestamp | Soft delete timestamp (nullable)   |
 
 ### Fingerprints
 Approved fingerprint credentials.  
 Raw biometric data is **never stored**.
 
-| Field | Type | Description |
-|------|------|-------------|
-| id | UUID | Unique fingerprint identifier |
-| label | String | Human-readable name |
-| template_id | String | Hardware fingerprint template reference |
-| enabled | Boolean | Whether fingerprint is active |
-| created_at | Timestamp | Enrollment timestamp |
-| deleted_at | Timestamp | Soft delete timestamp (nullable) |
+| Field       | Type      | Description                             |
+|-------------|-----------|-----------------------------------------|
+| id          | Int       | Unique fingerprint identifier           |
+| name        | String    | Name                                    |
+| template_id | String    | Hardware fingerprint template reference |
+| enabled     | Boolean   | Whether fingerprint is active           |
+| created_at  | Timestamp | Enrollment timestamp                    |
+| deleted_at  | Timestamp | Soft delete timestamp (nullable)        |
 
 ### Locks
 Registered smart lock devices.
 
-| Field | Type | Description |
-|------|------|-------------|
-| id | UUID | Unique lock identifier |
-| name | String | Human-readable lock name |
-| status | String | `locked`, `unlocked`, or `offline` |
-| last_heartbeat | Timestamp | Last device heartbeat |
-| created_at | Timestamp | Lock registration timestamp |
+| Field          | Type      | Description                        |
+|----------------|-----------|------------------------------------|
+| id             | Int       | Unique lock identifier             |
+| name           | String    | Human-readable lock name           |
+| status         | Enum      | `locked`, `unlocked`, or `offline` |
+| last_heartbeat | Timestamp | Last device heartbeat              |
+| created_at     | Timestamp | Lock registration timestamp        |
+| deleted_at     | Timestamp | Soft delete timestamp (nullable)   |
 
 ### Logs
 Append-only audit log of system and lock events.  
 Logs are **never modified or deleted**.
 
-| Field | Type | Description |
-|------|------|-------------|
-| id | UUID | Unique log identifier |
-| event_type | String | Type of event |
-| lock_id | UUID | Associated lock (nullable) |
-| fingerprint_id | UUID | Associated fingerprint (nullable) |
-| user_id | UUID | Associated admin user (nullable) |
-| success | Boolean | Whether the action succeeded |
-| timestamp | Timestamp | Event timestamp |
-| metadata | JSON | Additional structured event data |
+| Field          | Type      | Description                       |
+|----------------|-----------|-----------------------------------|
+| id             | Int       | Unique log identifier             |
+| event_type     | Enum      | Type of event                     |
+| lock_id        | Int       | Associated lock (nullable)        |
+| fingerprint_id | Int       | Associated fingerprint (nullable) |
+| user_id        | Int       | Associated admin user (nullable)  |
+| success        | Boolean   | Whether the action succeeded      |
+| timestamp      | Timestamp | Event timestamp                   |
+| event_metadata | JSON      | Additional structured event data  |
 
 
