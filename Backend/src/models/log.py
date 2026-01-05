@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from enum import Enum
 
-from sqlalchemy import String, DateTime, Enum as SQLEnum, Boolean, JSON
+from sqlalchemy import DateTime, Enum as SQLEnum, Boolean, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
