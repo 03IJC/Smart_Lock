@@ -40,8 +40,11 @@ The backend follows a layered architecture to separate concerns and improve main
     - `log_repository.py`
   - `schemas/` - Pydantic request/response schemas.
     - `authentication.py`
-    - `user.py`
+    - `device.py`
+    - `fingerprint.py`
+    - `lock.py`
     - `log.py`
+    - `user.py`
   - `services/` - Business logic.
     - `authentication_service.py`
     - `access_service.py`
@@ -59,8 +62,6 @@ Each layer has a single responsibility:
 ## REST Endpoints
 ### Authentication Endpoints
 - POST /auth/login | Authenticate user and return access tokens.
-- POST /auth/refresh | Refresh an expired access token.
-- POST /auth/logout | Invalidate current session.
 - GET /auth/me | Get current authenticated user.
 ### User Endpoints
 - GET /users | List all users.
@@ -88,6 +89,7 @@ Each layer has a single responsibility:
 
 #### Endpoint Notes
 - All endpoints (except authentication and device heartbeat) require authentication via JWT.
+- Access tokens will expire after 24 hours (requiring logging in again)
 - Logs endpoint supports pagination and filtering via query parameters.
 - Logs are expected to grow large and should be queried using pagination.
 - Device-facing endpoints use separate authentication from admin users.
