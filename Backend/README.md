@@ -35,9 +35,10 @@ The backend follows a layered architecture to separate concerns and improve main
     - `log.py`
     - `user.py`
   - `repositories/` - Data access layer.
-    - `user_repository.py`
     - `fingerprint_repository.py`
+    - `lock_repository.py`
     - `log_repository.py`
+    - `user_repository.py`
   - `schemas/` - Pydantic request/response schemas.
     - `authentication.py`
     - `device.py`
