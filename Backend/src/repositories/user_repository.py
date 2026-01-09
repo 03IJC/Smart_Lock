@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import cast
 
 from sqlalchemy.orm import Session
 from ..models.user import User
