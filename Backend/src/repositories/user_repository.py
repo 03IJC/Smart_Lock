@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import cast
 
 from sqlalchemy.orm import Session
+
 from ..models.user import User
 
 
@@ -47,3 +48,8 @@ class UserRepository:
     def soft_delete(self, user: User) -> None:
         user.deleted_at = datetime.now(timezone.utc)
         self.db.commit()
+
+    def save(self, user: User) -> User:
+        self.db.commit()
+        self.db.refresh(user)
+        return user

@@ -50,12 +50,14 @@ The backend follows a layered architecture to separate concerns and improve main
     - `authentication_service.py`
     - `access_service.py`
     - `logging_service.py`
+    - `user_service`
   - `utils/` - Helper utilities
     - `time.py`
 
 ### File Structure Notes
 Each layer has a single responsibility:
 - **API**: HTTP and request validation
+- **Core** App configuration and security
 - **Services**: Business rules
 - **Repositories**: Database access
 - **Models/Schemas**: Data representation
