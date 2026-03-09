@@ -30,11 +30,11 @@ class AuthenticationService:
             raise AuthenticationError("Invalid token")
 
         try:
-            user_id = int(user_id)
+            user_id = user_id
         except ValueError:
             raise AuthenticationError("Invalid token")
 
-        user = self.repo.get_by_id(int(user_id))
+        user = self.repo.get_by_id(user_id)
 
         if not user or user.deleted_at:
             raise AuthenticationError("Invalid token")

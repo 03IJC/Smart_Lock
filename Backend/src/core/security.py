@@ -1,3 +1,4 @@
+import secrets
 from typing import Any
 
 from jose import jwt, JWTError
@@ -10,6 +11,7 @@ from ..models.user import User
 SECRET_KEY = "CHANGE_THIS_TO_ENV_VARIABLE"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
+DEVICE_API_KEY = "CHANGE_THIS_TO_ENV_VARIABLE"
 
 pwd_context = CryptContext(
     schemes = ["bcrypt"],
@@ -42,3 +44,8 @@ def decode_token(token: str) -> dict[str, Any]:
         return jwt.decode(token, SECRET_KEY, algorithms = [ALGORITHM])
     except JWTError:
         raise TokenValidationError()
+
+def verify_api_key(api_key: str) -> bool:
+    if not api_key or not DEVICE_API_KEY:
+        return False
+    return secrets.compare_digest(api_key, DEVICE_API_KEY)

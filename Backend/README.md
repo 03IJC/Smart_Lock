@@ -49,10 +49,10 @@ The backend follows a layered architecture to separate concerns and improve main
   - `services/` - Business logic.
     - `authentication_service.py`
     - `access_service.py`
+    - `fingerprint_service.py`
+    - `lock_service.py`
     - `logging_service.py`
-    - `user_service`
-  - `utils/` - Helper utilities
-    - `time.py`
+    - `user_service.py`
 
 ### File Structure Notes
 Each layer has a single responsibility:
@@ -71,31 +71,37 @@ Each layer has a single responsibility:
 - POST /users | Create new user.
 - GET /users/{id} | Get user by ID.
 - PATCH /users/{id} | Update user details.
+- PATCH /users/{id}/password | Change a user's password.
 - DELETE /users/{id} | Soft delete a user.
 ### Fingerprint Endpoints
-- GET /fingerprints | List approved fingerprints.
+- GET /fingerprints | List of fingerprints.
+  - ?enabled=true | List of enabled fingerprints.
 - POST /fingerprints | Register a new fingerprint.
 - GET /fingerprints/{id} | Get fingerprint details.
 - PATCH /fingerprints/{id} | Enable, disable, or update a fingerprint.
 - DELETE /fingerprints/{id} | Soft delete a fingerprint.
 ### Lock Endpoints
 - GET /locks | List all registered locks.
+- POST /locks | Create new lock.
 - GET /locks/{id} | Get lock details.
 - POST /locks/{id}/unlock | Trigger an unlock action.
 - POST /locks/{id}/lock | Trigger a lock action.
 - GET /locks/{id}/state | Get current lock state.
-- POST /locks/{id}/heartbeat | Device heartbeat and status update.
+- DELETE /locks/{id} | Delete a lock.
 ### Log Endpoints
 - GET /logs | Retrieve access and system logs.
 ### System Endpoints
-- GET /health | Retrieves backend status
+- GET /health | Retrieves backend status.
+### Device Endpoints
+- POST /device/heartbeat/{lock_id} | Lock heartbeat and status update.
+- POST /device/access | Submit fingerprint scan and get access decision.
 
 #### Endpoint Notes
-- All endpoints (except authentication and device heartbeat) require authentication via JWT.
-- Access tokens will expire after 24 hours (requiring logging in again)
-- Logs endpoint supports pagination and filtering via query parameters.
-- Logs are expected to grow large and should be queried using pagination.
-- Device-facing endpoints use separate authentication from admin users.
+- All admin endpoints require authentication via JWT.
+- Device endpoints use separate API key authentication.
+- Access tokens expire after 24 hours.
+- Logs support pagination and filtering via query parameters.
+- Logs are append-only and never modified or deleted.
 
 
 ## Database Schema
