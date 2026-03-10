@@ -5,7 +5,7 @@ from ..core.dependencies import get_current_user, require_admin
 from ..core.exceptions import NotFoundError, ConflictError, ValidationError
 from ..database.session import get_db
 from ..models.user import User
-from ..schemas.user import UserCreate, UserUpdate, UserResponse, ChangePassword
+from ..schemas.user import *
 from ..services.user_service import UserService
 
 router = APIRouter(prefix = "/users", tags = ["Users"])
