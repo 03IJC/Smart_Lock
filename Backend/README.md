@@ -91,7 +91,14 @@ Each layer has a single responsibility:
 - DELETE /locks/{id} | Delete a lock.
 ### Log Endpoints
 - GET /logs | Retrieve access and system logs.
-  - 
+  - ?event_type= | Filter by event type (e.g. unlock_attempt, admin_login)
+  - ?lock_id= | Filter logs by associated lock
+  - ?user_id= | Filter logs by associated admin user
+  - ?success= | Filter by outcome (true or false)
+  - ?start_time= | Filter logs after this timestamp (ISO 8601)
+  - ?end_time= | Filter logs before this timestamp (ISO 8601)
+  - ?limit= | Number of results per page (default: 50)
+  - ?offset= | Number of results to skip for pagination (default: 0)
 ### System Endpoints
 - GET /health | Retrieves backend status.
 ### Device Endpoints
