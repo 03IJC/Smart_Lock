@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from ..core.exceptions import NotFoundError, ConflictError, ValidationError
 from ..models.lock import Lock, LockStatus
 from ..repositories.lock_repository import LockRepository
+from ..schemas.lock import LockCreate
 
 
 def _validate_lock(lock: Optional[Lock]) -> None:
@@ -22,11 +23,11 @@ class LockService:
     def __init__(self, db: Session):
         self.repo = LockRepository(db)
 
-    def create_lock(self, name: str) -> Lock:
-        if self.repo.get_by_name(name):
+    def create_lock(self, data: LockCreate) -> Lock:
+        if self.repo.get_by_name(data.name):
             raise ConflictError("Lock name already exists")
 
-        lock = Lock(name = name)
+        lock = Lock(name = data.name)
 
         return self.repo.create(lock)
 
