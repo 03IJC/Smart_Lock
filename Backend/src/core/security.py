@@ -5,13 +5,14 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 
+from .config import settings
 from .exceptions import TokenValidationError
 from ..models.user import User
 
-SECRET_KEY = "CHANGE_THIS_TO_ENV_VARIABLE"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 24
-DEVICE_API_KEY = "CHANGE_THIS_TO_ENV_VARIABLE"
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_HOURS = settings.access_token_expire_hours
+DEVICE_API_KEY = settings.device_api_key
 
 pwd_context = CryptContext(
     schemes = ["bcrypt"],
