@@ -16,6 +16,9 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     role: Optional[str] = None
 
+class ChangePassword(BaseModel):
+    new_password: str
+
 # Responses
 class UserResponse(UserBase):
     id: int
