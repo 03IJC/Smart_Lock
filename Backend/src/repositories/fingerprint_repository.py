@@ -66,8 +66,8 @@ class FingerprintRepository:
         self.db.refresh(fingerprint)
         return fingerprint
 
-    def soft_delete(self, fingerprint: Fingerprint) -> None:
-        fingerprint.deleted_at = datetime.now(timezone.utc)
+    def update_name(self, name: str, fingerprint: Fingerprint) -> None:
+        fingerprint.name = name
         self.db.commit()
 
     def enable(self, fingerprint: Fingerprint) -> None:
@@ -76,4 +76,8 @@ class FingerprintRepository:
 
     def disable(self, fingerprint: Fingerprint) -> None:
         fingerprint.enabled = False
+        self.db.commit()
+
+    def soft_delete(self, fingerprint: Fingerprint) -> None:
+        fingerprint.deleted_at = datetime.now(timezone.utc)
         self.db.commit()

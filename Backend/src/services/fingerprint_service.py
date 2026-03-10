@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from ..core.exceptions import NotFoundError, ConflictError, ValidationError
 from ..models.fingerprint import Fingerprint
 from ..repositories.fingerprint_repository import FingerprintRepository
+from ..schemas.fingerprint import FingerprintCreate
 
 
 def _validate_fingerprint(fingerprint: Optional[Fingerprint]) -> None:
@@ -18,16 +19,21 @@ class FingerprintService:
     def __init__(self, db: Session):
         self.repo = FingerprintRepository(db)
 
-    def create_fingerprint(self, name: str, template_id: str) -> Fingerprint:
-        if self.repo.get_by_template_id(template_id):
+    def create_fingerprint(self, data: FingerprintCreate) -> Fingerprint:
+        if self.repo.get_by_template_id(data.template_id):
             raise ConflictError("Template ID already registered")
 
         fingerprint = Fingerprint(
-            name = name,
-            template_id = template_id,
+            name = data.name,
+            template_id = data.template_id,
         )
 
         return self.repo.create(fingerprint)
+
+    def update_name(self, fingerprint_name: str,  fingerprint_id: int) -> None:
+        fingerprint = self.get_fingerprint_by_id(fingerprint_id)
+
+        self.repo.update_name(fingerprint_name, fingerprint)
 
     def enable_fingerprint(self, fingerprint_id: int) -> None:
         fingerprint = self.get_fingerprint_by_id(fingerprint_id)
