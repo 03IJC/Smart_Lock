@@ -7,7 +7,7 @@ from ..repositories.log_repository import LogRepository
 from ..schemas.log import LogFilter
 
 
-class LoggingService:
+class LogService:
     def __init__(self, db: Session):
         self.repo = LogRepository(db)
 
