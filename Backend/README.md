@@ -17,10 +17,11 @@ The backend follows a layered architecture to separate concerns and improve main
   - `main.py` - FastAPI application entry point.
   - `api/` - API route definitions.
     - `authentication.py`
-    - `users.py`
+    - `device.py`
     - `fingerprints.py`
     - `locks.py`
     - `logs.py`
+    - `users.py`
   - `core/` - App configuration and security.
     - `config.py`
     - `security.py`
@@ -51,7 +52,7 @@ The backend follows a layered architecture to separate concerns and improve main
     - `access_service.py`
     - `fingerprint_service.py`
     - `lock_service.py`
-    - `logging_service.py`
+    - `log_service.py`
     - `user_service.py`
 
 ### File Structure Notes
@@ -90,6 +91,7 @@ Each layer has a single responsibility:
 - DELETE /locks/{id} | Delete a lock.
 ### Log Endpoints
 - GET /logs | Retrieve access and system logs.
+  - 
 ### System Endpoints
 - GET /health | Retrieves backend status.
 ### Device Endpoints
