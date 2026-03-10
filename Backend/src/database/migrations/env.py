@@ -4,11 +4,12 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
-from src.models.base import Base
-from src.models.user import User
-from src.models.fingerprint import Fingerprint
-from src.models.lock import Lock
-from src.models.log import Log
+from ...core.config import settings
+from ...models.base import Base
+from ...models.user import User
+from ...models.fingerprint import Fingerprint
+from ...models.lock import Lock
+from ...models.log import Log
 
 # Alembic Config object
 config = context.config
@@ -24,7 +25,7 @@ def run_migrations_offline() -> None:
     """
         Run migrations in 'offline' mode.
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option("sqlalchemy.url", settings.database_url)
     context.configure(
         url=url,
         target_metadata=target_metadata,
