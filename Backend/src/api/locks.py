@@ -4,10 +4,12 @@ from sqlalchemy.orm import Session
 from ..core.dependencies import get_current_user, require_admin
 from ..core.exceptions import NotFoundError, ConflictError, ValidationError
 from ..database.session import get_db
+from ..models.log import EventType
 from ..models.user import User
 from ..models.lock import LockStatus
 from ..schemas.lock import *
 from ..services.lock_service import LockService
+from ..services.log_service import LogService
 
 router = APIRouter(prefix = "/locks", tags = ["Locks"])
 
@@ -25,7 +27,16 @@ def create_lock(
     db: Session = Depends(get_db)
 ):
     try:
-        return LockService(db).create_lock(data)
+        lock = LockService(db).create_lock(data)
+
+        LogService(db).log(
+            event_type = EventType.LOCK_CREATED,
+            success = True,
+            lock_id = lock.id,
+            user_id = current_user.id
+        )
+
+        return lock
     except ConflictError as e:
         raise HTTPException(status_code = status.HTTP_409_CONFLICT, detail = str(e))
 
@@ -47,7 +58,16 @@ def unlock_lock(
     db: Session = Depends(get_db)
 ):
     try:
-        return LockService(db).unlock(lock_id)
+        lock = LockService(db).unlock(lock_id)
+
+        LogService(db).log(
+            event_type = EventType.LOCK_UNLOCKED,
+            success = True,
+            lock_id = lock_id,
+            user_id = current_user.id
+        )
+
+        return lock
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
     except ValidationError as e:
@@ -60,7 +80,16 @@ def lock_lock(
     db: Session = Depends(get_db)
 ):
     try:
-        return LockService(db).lock(lock_id)
+        lock = LockService(db).lock(lock_id)
+
+        LogService(db).log(
+            event_type = EventType.LOCK_LOCKED,
+            success = True,
+            lock_id = lock_id,
+            user_id = current_user.id
+        )
+
+        return lock
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
     except ValidationError as e:
@@ -86,5 +115,12 @@ def delete_lock(
 ):
     try:
         LockService(db).delete_lock(lock_id)
+
+        LogService(db).log(
+            event_type = EventType.LOCK_DELETED,
+            success = True,
+            lock_id = lock_id,
+            user_id = current_user.id
+        )
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
