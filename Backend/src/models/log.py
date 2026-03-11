@@ -18,7 +18,6 @@ class EventType(str, Enum):
     FINGERPRINT_REMOVED = "fingerprint_removed"
 
     ADMIN_LOGIN = "admin_login"
-    MANUAL_UNLOCK = "manual_unlock"
 
     LOCK_CREATED = "lock_created"
     LOCK_DELETED = "lock_deleted"
