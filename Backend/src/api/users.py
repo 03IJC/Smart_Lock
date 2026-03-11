@@ -4,8 +4,10 @@ from sqlalchemy.orm import Session
 from ..core.dependencies import get_current_user, require_admin
 from ..core.exceptions import NotFoundError, ConflictError, ValidationError
 from ..database.session import get_db
+from ..models.log import EventType
 from ..models.user import User
 from ..schemas.user import *
+from ..services.log_service import LogService
 from ..services.user_service import UserService
 
 router = APIRouter(prefix = "/users", tags = ["Users"])
@@ -26,7 +28,15 @@ def create_user(
     db: Session = Depends(get_db)
 ):
     try:
-        return UserService(db).create_user(data)
+        user = UserService(db).create_user(data)
+
+        LogService(db).log(
+            event_type = EventType.USER_CREATED,
+            success = True,
+            user_id = user.id
+        )
+
+        return user
     except ConflictError as e:
         raise HTTPException(status_code = status.HTTP_409_CONFLICT, detail = str(e))
 
@@ -51,7 +61,15 @@ def update_user(
     db: Session = Depends(get_db)
 ):
     try:
-        return UserService(db).update_user(user_id, data)
+        user = UserService(db).update_user(user_id, data)
+
+        LogService(db).log(
+            event_type = EventType.USER_UPDATED,
+            success = True,
+            user_id = user_id
+        )
+
+        return user
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
     except ValidationError as e:
@@ -67,6 +85,11 @@ def change_password(
 ):
     try:
         UserService(db).change_password(user_id, data.new_password)
+        LogService(db).log(
+            event_type = EventType.USER_PASSWORD_CHANGED,
+            success = True,
+            user_id = user_id
+        )
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
     except ValidationError as e:
@@ -81,6 +104,12 @@ def delete_user(
 ):
     try:
         UserService(db).soft_delete_user(user_id)
+
+        LogService(db).log(
+            event_type = EventType.USER_DELETED,
+            success = True,
+            user_id = user_id
+        )
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
     except ValidationError as e:
