@@ -9,7 +9,7 @@ from ..models.lock import LockStatus
 from ..schemas.lock import *
 from ..services.lock_service import LockService
 
-router = APIRouter(prefix = "/locks", tags = ["locks"])
+router = APIRouter(prefix = "/locks", tags = ["Locks"])
 
 @router.get("", response_model = list[LockResponse])
 def list_locks(
