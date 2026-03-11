@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.config import settings
+from .core.config import settings
 from api import authentication, users, fingerprints, locks, logs, device
 
 app = FastAPI(
