@@ -20,7 +20,16 @@ class EventType(str, Enum):
     ADMIN_LOGIN = "admin_login"
     MANUAL_UNLOCK = "manual_unlock"
 
+    LOCK_CREATED = "lock_created"
+    LOCK_DELETED = "lock_deleted"
+    LOCK_LOCKED = "lock_locked"
+    LOCK_UNLOCKED = "lock_unlocked"
     LOCK_HEARTBEAT = "lock_heartbeat"
+
+    USER_CREATED = "user_created"
+    USER_DELETED = "user_deleted"
+    USER_UPDATED = "user_updated"
+    USER_PASSWORD_CHANGED = "user_password_changed"
 
 class Log(Base):
     __tablename__ = "logs"
