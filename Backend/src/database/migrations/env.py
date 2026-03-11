@@ -1,15 +1,18 @@
+import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
-from ...core.config import settings
-from ...models.base import Base
-from ...models.user import User
-from ...models.fingerprint import Fingerprint
-from ...models.lock import Lock
-from ...models.log import Log
+sys.path.insert(0, "/app")
+
+from src.core.config import settings
+from src.models.base import Base
+from src.models.user import User
+from src.models.fingerprint import Fingerprint
+from src.models.lock import Lock
+from src.models.log import Log
 
 # Alembic Config object
 config = context.config
@@ -41,8 +44,11 @@ def run_migrations_online() -> None:
     """
         Run migrations in 'online' mode.
     """
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = settings.database_url
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
