@@ -4,9 +4,11 @@ from sqlalchemy.orm import Session
 from ..core.dependencies import get_current_user, require_admin
 from ..core.exceptions import NotFoundError, ConflictError, ValidationError
 from ..database.session import get_db
+from ..models.log import EventType
 from ..models.user import User
 from ..schemas.fingerprint import *
 from ..services.fingerprint_service import FingerprintService
+from ..services.log_service import LogService
 
 router = APIRouter(prefix = "/fingerprints", tags = ["Fingerprints"])
 
@@ -27,7 +29,16 @@ def create_fingerprint(
     db: Session = Depends(get_db)
 ):
     try:
-        return FingerprintService(db).create_fingerprint(data)
+        fingerprint = FingerprintService(db).create_fingerprint(data)
+
+        LogService(db).log(
+            event_type = EventType.FINGERPRINT_ADDED,
+            success = True,
+            fingerprint_id = fingerprint.id,
+            user_id = current_user.id
+        )
+
+        return fingerprint
     except ConflictError as e:
         raise HTTPException(status_code = status.HTTP_409_CONFLICT, detail = str(e))
 
@@ -54,8 +65,22 @@ def update_fingerprint(
 
         if data.enabled is True:
             service.enable_fingerprint(fingerprint_id)
+
+            LogService(db).log(
+                event_type = EventType.FINGERPRINT_ENABLED,
+                success = True,
+                fingerprint_id = fingerprint_id,
+                user_id = current_user.id
+            )
         if data.enabled is False:
             service.disable_fingerprint(fingerprint_id)
+
+            LogService(db).log(
+                event_type = EventType.FINGERPRINT_DISABLED,
+                success = True,
+                fingerprint_id = fingerprint_id,
+                user_id = current_user.id
+            )
         if data.name:
             service.update_name(data.name, fingerprint_id)
 
@@ -73,6 +98,13 @@ def delete_fingerprint(
 ):
     try:
         FingerprintService(db).soft_delete_fingerprint(fingerprint_id)
+
+        LogService(db).log(
+            event_type = EventType.FINGERPRINT_REMOVED,
+            success = True,
+            fingerprint_id = fingerprint_id,
+            user_id = current_user.id
+        )
     except NotFoundError as e:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
     except ValidationError as e:
