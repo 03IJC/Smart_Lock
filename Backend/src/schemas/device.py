@@ -7,4 +7,8 @@ class LockHeartbeat(BaseModel):
 
 class AccessAttempt(BaseModel):
     template_id: str
-    success: bool
+    lock_id: int
+
+# Response
+class AccessResponse(BaseModel):
+    granted: bool
