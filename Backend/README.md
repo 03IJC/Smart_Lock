@@ -1,14 +1,106 @@
 # Smart Lock Backend
-Backend service for a fingerprint-based smart lock system with audit logging.
-Provides authentication, access control, lock management, and full audit logging via a REST API.
+Backend service for a fingerprint-based smart lock system built with FastAPI.
 
-Built with Python and FastAPI and designed for use with:
-- A hardware smart lock device
-- A web-based admin UI
+The system provides:
+- secure admin authentication
+- fingerprint-based access control
+- device communication for smart locks
+- append-only audit logging of all system activity
+
+The backend is designed to operate alongside:
+- an ESP32-based hardware smart lock device
+- a web-based admin interface
 
 ## Architecture Overview
 The system follows a service-oriented, layered architecture designed for security,
 auditability, and future expansion.
+
+## Tech Stack
+Backend
+- FastAPI
+- Python
+- SQLAlchemy
+- Alembic
+
+Database
+- PostgreSQL
+
+Infrastructure
+- Docker
+- Docker Compose
+
+Authentication
+- JWT Access Tokens
+
+## Security Model
+The backend enforces multiple security layers:
+
+Admin Authentication
+- Admin users authenticate via JWT access tokens.
+- Tokens expire after 24 hours.
+
+Device Authentication
+- Hardware devices authenticate using a shared device API key.
+
+Audit Logging
+- All access attempts and admin actions are recorded.
+- Logs are append-only and cannot be modified or deleted.
+
+Data Integrity
+- All destructive operations use soft deletes to preserve historical records.
+
+Biometric Privacy
+- Raw fingerprint biometric data is never stored.
+- Only hardware template identifiers are persisted.
+
+## How to Run
+### Prerequisites
+- Docker
+- Docker Compose
+
+### Setup
+1. Clone the repository and go to the backend directory
+```bash
+  git clone https://github.com/03IJC/Smart_Lock.git
+  cd smart-lock/Backend
+```
+2. Copy the example environment file and edit `.env` and fill in your values.
+```bash
+  cp .env.example .env
+```
+3. Start the services
+```bash
+  docker compose up --build
+```
+4. Run database migrations
+```bash
+  docker compose exec api alembic upgrade head
+```
+5. Create first admin user and insert them into the database
+```bash
+   docker compose exec api python3 -c "from src.core.security import hash_password; print(hash_password('yourpassword'))"
+```
+```bash
+   docker compose exec db psql -U $DB_USER -d $DB_NAME
+```
+```sql
+   INSERT INTO users (name, username, password_hash, role, created_at)
+   VALUES ('Admin', 'admin', '<PASTE_HASH_HERE>', 'admin', NOW());
+```
+6. Access the API docs
+```
+   http://localhost:8000/docs
+```
+
+### Stopping the services
+```bash
+  docker compose down
+```
+
+### Resetting the database
+```bash
+  docker compose down -v
+```
 
 ## File Structure
 The backend follows a layered architecture to separate concerns and improve maintainability.
@@ -112,6 +204,13 @@ Each layer has a single responsibility:
 - Logs support pagination and filtering via query parameters.
 - Logs are append-only and never modified or deleted.
 
+## Device Communication Flow
+1. The ESP32 device scans a fingerprint using the onboard sensor.
+2. The device sends the fingerprint template ID and lock ID to the backend `/device/access` endpoint.
+3. The backend validates the fingerprint and determines access permissions.
+4. The backend returns an allow/deny decision.
+5. The device unlocks the door if access is granted.
+6. The access attempt is recorded in the audit log.
 
 ## Database Schema
 The backend uses a relational database to persist system state and audit data.
